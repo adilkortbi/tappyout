@@ -1,0 +1,39 @@
+.PhoneInput-wrapper :global(.PhoneInput) {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.PhoneInput-wrapper :global(.PhoneInputCountry) {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0 0.5rem;
+}
+
+.PhoneInput-wrapper :global(.PhoneInputInput) {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.PhoneInput-wrapper :global(.PhoneInputCountrySelect) {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+  border: none;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.PhoneInput-wrapper :global(.PhoneInputCountryIcon) {
+  width: 1.5rem;
+  height: 1.5rem;
+}
