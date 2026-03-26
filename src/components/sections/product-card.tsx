@@ -92,7 +92,7 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
           <Button asChild variant="secondary" className="w-full">
             <Link href={`/customize/${product.id}`}>
-              Customize & Buy
+              {product.id === 'premium-wood' ? 'Add Link' : 'Customize & Add Link'}
             </Link>
           </Button>
         </div>

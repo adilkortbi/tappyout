@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { PRODUCTS } from '@/lib/constants/products';
-import { ArrowLeft, Check, ShoppingCart, Palette } from 'lucide-react';
+import { ArrowLeft, Check, ShoppingCart, Palette, Link2 } from 'lucide-react';
 
 interface ProductPageProps {
   params: Promise<{
@@ -135,8 +135,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </Button> */}
               <Button size="lg" className="h-12 bg-brand hover:bg-brand/90" asChild>
                 <Link href={`/customize/${product.id}`}>
-                  <Palette className="h-4 w-4 mr-2" />
-                  Customize
+                  {product.id === 'premium-wood' ? (
+                    <>
+                      <Link2 className="h-4 w-4 mr-2" />
+                      Add Link
+                    </>
+                  ) : (
+                    <>
+                      <Palette className="h-4 w-4 mr-2" />
+                      Customize
+                    </>
+                  )}
                 </Link>
               </Button>
             </div>

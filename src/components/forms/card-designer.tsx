@@ -25,8 +25,11 @@ export function CardDesigner({ cardTemplate = 'standard', onDesignChange, onSave
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
+  const isWoodenCard = cardTemplate === 'premium-wood';
+
   useEffect(() => {
-    if (!canvasRef.current) return;
+    // Skip canvas setup for wooden cards
+    if (!canvasRef.current || isWoodenCard) return;
 
     const fabricCanvas = new fabric.Canvas(canvasRef.current, {
       width: 400,
@@ -91,10 +94,51 @@ export function CardDesigner({ cardTemplate = 'standard', onDesignChange, onSave
       setSelectedObject(null);
     });
 
+    // Limit scaling so logo stays within the visible card area
+    // Card has padding in the template image, actual card boundaries:
+    const cardLeft = 50;
+    const cardTop = 35;
+    const cardWidth = 300;
+    const cardHeight = 180;
+    const cardRight = cardLeft + cardWidth;
+    const cardBottom = cardTop + cardHeight;
+
+    fabricCanvas.on("object:scaling", (e) => {
+      const obj = e.target;
+      if (!obj || !obj.width || !obj.height) return;
+
+      // Cap scale to card dimensions
+      const maxScaleX = cardWidth / obj.width;
+      const maxScaleY = cardHeight / obj.height;
+
+      if (obj.scaleX! > maxScaleX) obj.scaleX = maxScaleX;
+      if (obj.scaleY! > maxScaleY) obj.scaleY = maxScaleY;
+
+      // Get the actual bounding box after scaling
+      obj.setCoords();
+      const bound = obj.getBoundingRect();
+
+      // Constrain position to keep within card area
+      if (bound.left < cardLeft) {
+        obj.left = obj.left! + (cardLeft - bound.left);
+      }
+      if (bound.top < cardTop) {
+        obj.top = obj.top! + (cardTop - bound.top);
+      }
+      if (bound.left + bound.width > cardRight) {
+        obj.left = obj.left! - (bound.left + bound.width - cardRight);
+      }
+      if (bound.top + bound.height > cardBottom) {
+        obj.top = obj.top! - (bound.top + bound.height - cardBottom);
+      }
+
+      obj.setCoords();
+    });
+
     return () => {
       fabricCanvas.dispose();
     };
-  }, [cardTemplate]);
+  }, [cardTemplate, isWoodenCard]);
 
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,14 +150,15 @@ export function CardDesigner({ cardTemplate = 'standard', onDesignChange, onSave
       const result = e.target?.result as string;
       
       fabric.Image.fromURL(result).then((img) => {
-        // Scale image to fit nicely on card
-        const maxWidth = 150;
-        const maxHeight = 100;
-        const scale = Math.min(maxWidth / img.width!, maxHeight / img.height!);
-        
-        // Center the logo on the canvas
-        const centerX = (400 - (img.width! * scale)) / 2;
-        const centerY = (250 - (img.height! * scale)) / 2;
+        // Scale image to fill the card area (max size initially)
+        // Card boundaries: left=50, top=35, width=300, height=180
+        const cardWidth = 300;
+        const cardHeight = 180;
+        const scale = Math.min(cardWidth / img.width!, cardHeight / img.height!);
+
+        // Center the logo within the card area
+        const centerX = 50 + (cardWidth - (img.width! * scale)) / 2;
+        const centerY = 35 + (cardHeight - (img.height! * scale)) / 2;
         
         img.set({
           left: centerX,
@@ -168,28 +213,31 @@ export function CardDesigner({ cardTemplate = 'standard', onDesignChange, onSave
   };
 
   const handleSaveAndContinue = () => {
-    if (!canvas) return;
-    
+    // For non-wooden cards, canvas is required
+    if (!isWoodenCard && !canvas) return;
+
     if (!nfcLink.trim()) {
       setUrlError('Please enter a valid URL for your NFC card.');
       return;
     }
-    
+
     // Clear any previous error
     setUrlError('');
 
     const designData = {
-      canvas: canvas.toJSON(),
+      canvas: isWoodenCard ? {} : canvas!.toJSON(),
       nfcLink: nfcLink.trim(),
     };
-    
+
     if (onDesignChange) {
       onDesignChange(designData);
     }
 
     toast({
-      title: "Design saved successfully",
-      description: "Your card design and NFC link have been saved.",
+      title: isWoodenCard ? "NFC link saved" : "Design saved successfully",
+      description: isWoodenCard
+        ? "Your NFC link has been saved."
+        : "Your card design and NFC link have been saved.",
     });
 
     // Scroll to add-to-cart section
@@ -210,6 +258,61 @@ export function CardDesigner({ cardTemplate = 'standard', onDesignChange, onSave
     }
   };
 
+  // Simplified UI for wooden cards - NFC link only, no logo customization
+  if (isWoodenCard) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Square className="h-5 w-5" />
+              Wood Card Setup
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Info about wooden cards */}
+            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                Premium wooden cards feature a natural wood finish and cannot be customized with a logo. Each card showcases the unique grain pattern of the wood.
+              </p>
+            </div>
+
+            {/* NFC Link */}
+            <div className="space-y-4">
+              <Label className="text-base font-semibold">NFC Link</Label>
+              <div className="space-y-2">
+                <Input
+                  type="url"
+                  placeholder="https://your-website.com"
+                  value={nfcLink}
+                  onChange={(e) => {
+                    setNfcLink(e.target.value);
+                    if (urlError) setUrlError('');
+                  }}
+                  className={`w-full ${urlError ? 'border-red-500 focus:border-red-500' : ''}`}
+                />
+                {urlError && (
+                  <p className="text-xs text-red-600 mt-1">
+                    {urlError}
+                  </p>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  This link will be programmed into your NFC card. When someone taps your card, they&apos;ll be directed to this URL.
+                </p>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Save Button */}
+            <Button onClick={handleSaveAndContinue} className="w-full bg-brand hover:bg-brand/90">
+              Save & Continue
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -255,6 +358,11 @@ export function CardDesigner({ cardTemplate = 'standard', onDesignChange, onSave
                 <p className="text-xs text-muted-foreground">
                   Supports PNG, JPG, and SVG files up to 5MB
                 </p>
+                {cardTemplate !== 'standard-white' && (
+                  <p className="text-xs text-amber-600 dark:text-amber-400">
+                    💡 Tip: Use a white or light-colored logo for best visibility on the black card.
+                  </p>
+                )}
               </div>
             </div>
 

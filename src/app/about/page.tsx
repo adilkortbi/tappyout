@@ -16,7 +16,7 @@ const team = [
   {
     name: 'Adil Kortbi',
     role: 'CEO & Founder',
-    description: 'Former tech executive with 15+ years in digital innovation.',
+    description: 'Entrepreneur with 5+ years in the trades industries and 2+ years in digital innovations.',
     avatar: '/images/team/sarah.jpg'
   }
 ];
@@ -221,7 +221,7 @@ export default function AboutPage() {
                   <MapPin className="h-5 w-5 text-primary" />
                   <div>
                     <div className="font-medium">Visit Us</div>
-                    <div className="text-muted-foreground">123 Business Ave, Dublin City, D01 2345</div>
+                    <div className="text-muted-foreground">177 roselawn road, Dublin 15, Dublin</div>
                   </div>
                 </div>
               </div>

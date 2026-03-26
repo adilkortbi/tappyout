@@ -92,13 +92,13 @@ export function Hero() {
           {/* Hero Image/Visual */}
           <div className="relative">
             <div className="relative z-10">
-              <div className="aspect-square rounded-3xl overflow-hidden border border-border/50">
+              <Link href="/shop" className="block aspect-square rounded-3xl overflow-hidden border border-border/50 cursor-pointer">
                 <img
                   src="/hero.png"
                   alt="Premium Digital Business Card"
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 />
-              </div>
+              </Link>
             </div>
             
             {/* Background Elements */}

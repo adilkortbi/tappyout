@@ -176,24 +176,45 @@ export default function CustomizePage({ params }: CustomizePageProps) {
               <CardTitle>Customization</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm">Logo Upload & Sizing</span>
-                  <span className="text-sm font-medium">Included</span>
+              {product.id === 'premium-wood' ? (
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-sm">Logo Upload & Sizing</span>
+                    <span className="text-sm text-muted-foreground">Not Available</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm">NFC Link Programming</span>
+                    <span className="text-sm font-medium">Included</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm">Laser-Engraved NFC Icon</span>
+                    <span className="text-sm font-medium">Included</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm">Eco-Friendly Packaging</span>
+                    <span className="text-sm font-medium">Included</span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm">Custom Color Scheme</span>
-                  <span className="text-sm text-muted-foreground">Available</span>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-sm">Logo Upload & Sizing</span>
+                    <span className="text-sm font-medium">Included</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm">Custom Color Scheme</span>
+                    <span className="text-sm text-muted-foreground">Available</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm">Text Customization</span>
+                    <span className="text-sm text-muted-foreground">Available</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm">Premium Packaging</span>
+                    <span className="text-sm font-medium">+€5.00</span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm">Text Customization</span>
-                  <span className="text-sm text-muted-foreground">Available</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm">Premium Packaging</span>
-                  <span className="text-sm font-medium">+€5.00</span>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
 

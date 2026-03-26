@@ -76,7 +76,7 @@ export function Footer() {
               </div>
               <div className="flex items-center space-x-2">
                 <MapPin className="h-4 w-4" />
-                <span>123 Business Ave, Dublin City, D01 2345</span>
+                <span>177 roselawn road, Dublin 15, Dublin</span>
               </div>
             </div>
           </div>
