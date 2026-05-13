@@ -8,7 +8,7 @@ import { FAQS } from '@/lib/constants/content';
 
 export function FAQ() {
   return (
-    <section className="py-24">
+    <section id="faq" className="py-24">
       <div className="container mx-auto px-4">
         <div className="text-center space-y-4 mb-16">
           <h2 className="text-3xl md:text-4xl font-bold">
@@ -46,10 +46,10 @@ export function FAQ() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <a 
-              href="mailto:adilkortbi@tappy-out.com" 
+              href="mailto:support@tappy-out.com" 
               className="text-primary hover:underline font-medium"
             >
-              adilkortbi@tappy-out.com
+              support@tappy-out.com
             </a>
             <span className="hidden sm:inline text-muted-foreground">•</span>
             <a 

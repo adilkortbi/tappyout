@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { X, Plus, Minus, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,17 +11,39 @@ import { useCartStore } from '@/lib/store/cart';
 import Link from 'next/link';
 
 export function Cart() {
-  const { 
-    items, 
-    isOpen, 
-    closeCart, 
-    removeItem, 
-    updateQuantity, 
+  const {
+    items,
+    isOpen,
+    closeCart,
+    removeItem,
+    updateQuantity,
     getTotal,
     getItemCount
   } = useCartStore();
 
-  if (!isOpen) return null;
+  const [isVisible, setIsVisible] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsAnimating(true);
+      // Small delay to ensure the component is mounted before animating
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setIsVisible(true);
+        });
+      });
+    } else {
+      setIsVisible(false);
+      // Wait for animation to complete before unmounting
+      const timer = setTimeout(() => {
+        setIsAnimating(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  if (!isOpen && !isAnimating) return null;
 
   const total = getTotal();
   const itemCount = getItemCount();
@@ -28,16 +51,22 @@ export function Cart() {
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
       {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+      <div
+        className={`absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ease-out ${
+          isVisible ? 'opacity-100' : 'opacity-0'
+        }`}
         onClick={closeCart}
       />
-      
+
       {/* Cart Panel */}
-      <div className="absolute right-0 top-0 h-full w-full max-w-md bg-background shadow-xl">
+      <div
+        className={`absolute right-0 top-0 h-full w-full max-w-md bg-background shadow-xl rounded-l-2xl transition-transform duration-300 ease-out ${
+          isVisible ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
         <div className="flex h-full flex-col">
           {/* Header */}
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pt-8 pb-6">
             <CardTitle className="flex items-center gap-2">
               <ShoppingBag className="h-5 w-5" />
               Shopping Cart

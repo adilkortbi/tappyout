@@ -42,9 +42,9 @@ export function Testimonials() {
                   </Avatar>
                   <div>
                     <div className="font-semibold">{testimonial.name}</div>
-                    <div className="text-sm text-muted-foreground">
+                    {/* <div className="text-sm text-muted-foreground">
                       {testimonial.role} at {testimonial.company}
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </CardContent>

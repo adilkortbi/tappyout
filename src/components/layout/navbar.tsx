@@ -41,9 +41,9 @@ export function Navbar() {
             <Image
               src={theme === 'dark' ? '/tappy-out-dark-mode.svg' : '/tappy-out-light-mode.svg'}
               alt="Logo"
-              width={96}
-              height={24}
-              className="h-10 w-24"
+              width={176}
+              height={44}
+              className="h-14 w-44"
             />
           </Link>
 

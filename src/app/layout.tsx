@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/footer";
 import { Cart } from "@/components/layout/cart";
 import { ThemeProvider } from "@/lib/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { HashScroll } from "@/components/utils/hash-scroll";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -49,6 +50,7 @@ export default function RootLayout({
             <Footer />
             <Cart />
             <Toaster />
+            <HashScroll />
           </div>
         </ThemeProvider>
       </body>

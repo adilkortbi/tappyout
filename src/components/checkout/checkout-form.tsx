@@ -5,7 +5,6 @@ import {
   useStripe,
   useElements,
   PaymentElement,
-  AddressElement,
 } from '@stripe/react-stripe-js';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,6 +33,15 @@ export function CheckoutForm({ total, onOrderComplete }: CheckoutFormProps) {
     phone: '',
   });
 
+  const [shippingAddress, setShippingAddress] = useState({
+    line1: '',
+    line2: '',
+    city: '',
+    state: '',
+    postalCode: '',
+    country: 'IE',
+  });
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -56,6 +64,14 @@ export function CheckoutForm({ total, onOrderComplete }: CheckoutFormProps) {
       total,
       customerEmail: customerInfo.email,
       customerName: `${customerInfo.firstName} ${customerInfo.lastName}`,
+      shippingAddress: {
+        line1: shippingAddress.line1,
+        line2: shippingAddress.line2,
+        city: shippingAddress.city,
+        state: shippingAddress.state,
+        postalCode: shippingAddress.postalCode,
+        country: shippingAddress.country,
+      },
     }));
 
     const { error: submitError } = await elements.submit();
@@ -70,6 +86,17 @@ export function CheckoutForm({ total, onOrderComplete }: CheckoutFormProps) {
       confirmParams: {
         return_url: `${window.location.origin}/checkout/success`,
         receipt_email: customerInfo.email,
+        shipping: {
+          name: `${customerInfo.firstName} ${customerInfo.lastName}`,
+          address: {
+            line1: shippingAddress.line1,
+            line2: shippingAddress.line2 || undefined,
+            city: shippingAddress.city,
+            state: shippingAddress.state || undefined,
+            postal_code: shippingAddress.postalCode,
+            country: shippingAddress.country,
+          },
+        },
       },
       redirect: 'if_required',
     });
@@ -88,6 +115,14 @@ export function CheckoutForm({ total, onOrderComplete }: CheckoutFormProps) {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setCustomerInfo((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleShippingChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setShippingAddress((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -166,12 +201,87 @@ export function CheckoutForm({ total, onOrderComplete }: CheckoutFormProps) {
             Shipping Address
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <AddressElement
-            options={{
-              mode: 'shipping',
-            }}
-          />
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="line1">Address</Label>
+            <Input
+              id="line1"
+              name="line1"
+              placeholder="123 Main Street"
+              value={shippingAddress.line1}
+              onChange={handleShippingChange}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="line2">Apartment, suite, etc. (optional)</Label>
+            <Input
+              id="line2"
+              name="line2"
+              placeholder="Apt 4B"
+              value={shippingAddress.line2}
+              onChange={handleShippingChange}
+            />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="city">City</Label>
+              <Input
+                id="city"
+                name="city"
+                placeholder="Dublin"
+                value={shippingAddress.city}
+                onChange={handleShippingChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="state">County / State</Label>
+              <Input
+                id="state"
+                name="state"
+                placeholder="County Dublin"
+                value={shippingAddress.state}
+                onChange={handleShippingChange}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="postalCode">Postal Code</Label>
+              <Input
+                id="postalCode"
+                name="postalCode"
+                placeholder="D15 XY12"
+                value={shippingAddress.postalCode}
+                onChange={handleShippingChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="country">Country</Label>
+              <select
+                id="country"
+                name="country"
+                value={shippingAddress.country}
+                onChange={handleShippingChange}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                required
+              >
+                <option value="IE">Ireland</option>
+                <option value="GB">United Kingdom</option>
+                <option value="US">United States</option>
+                <option value="DE">Germany</option>
+                <option value="FR">France</option>
+                <option value="ES">Spain</option>
+                <option value="IT">Italy</option>
+                <option value="NL">Netherlands</option>
+                <option value="BE">Belgium</option>
+                <option value="AT">Austria</option>
+                <option value="PT">Portugal</option>
+              </select>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -186,8 +296,21 @@ export function CheckoutForm({ total, onOrderComplete }: CheckoutFormProps) {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <PaymentElement />
-          
+          {!stripe || !elements ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-center space-y-2">
+                <Loader2 className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">Loading payment form...</p>
+              </div>
+            </div>
+          ) : (
+            <PaymentElement
+              options={{
+                layout: 'tabs',
+              }}
+            />
+          )}
+
           <div className="flex items-center space-x-2 text-sm text-muted-foreground">
             <Lock className="h-4 w-4" />
             <span>Your payment information is secure and encrypted</span>

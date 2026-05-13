@@ -96,10 +96,10 @@ export function CardDesigner({ cardTemplate = 'standard', onDesignChange, onSave
 
     // Limit scaling so logo stays within the visible card area
     // Card has padding in the template image, actual card boundaries:
-    const cardLeft = 50;
-    const cardTop = 35;
-    const cardWidth = 300;
-    const cardHeight = 180;
+    const cardLeft = 80;
+    const cardTop = 50;
+    const cardWidth = 240;
+    const cardHeight = 140;
     const cardRight = cardLeft + cardWidth;
     const cardBottom = cardTop + cardHeight;
 
@@ -151,14 +151,14 @@ export function CardDesigner({ cardTemplate = 'standard', onDesignChange, onSave
       
       fabric.Image.fromURL(result).then((img) => {
         // Scale image to fill the card area (max size initially)
-        // Card boundaries: left=50, top=35, width=300, height=180
-        const cardWidth = 300;
-        const cardHeight = 180;
+        // Card boundaries: left=80, top=50, width=240, height=140
+        const cardWidth = 240;
+        const cardHeight = 140;
         const scale = Math.min(cardWidth / img.width!, cardHeight / img.height!);
 
         // Center the logo within the card area
-        const centerX = 50 + (cardWidth - (img.width! * scale)) / 2;
-        const centerY = 35 + (cardHeight - (img.height! * scale)) / 2;
+        const centerX = 80 + (cardWidth - (img.width! * scale)) / 2;
+        const centerY = 50 + (cardHeight - (img.height! * scale)) / 2;
         
         img.set({
           left: centerX,
@@ -324,13 +324,15 @@ export function CardDesigner({ cardTemplate = 'standard', onDesignChange, onSave
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Canvas */}
-          <div className="flex justify-center">
-            <div className="border rounded-lg p-4 bg-muted/30">
-              <canvas 
-                ref={canvasRef}
-                className="border rounded shadow-sm"
-              />
+          {/* Canvas - scaled down on mobile to fit screen */}
+          <div className="flex justify-center -mx-2 sm:mx-0">
+            <div className="border rounded-lg p-2 sm:p-4 bg-muted/30">
+              <div className="w-[300px] h-[187px] sm:w-[400px] sm:h-[250px]">
+                <canvas
+                  ref={canvasRef}
+                  className="border rounded shadow-sm scale-[0.75] sm:scale-100 origin-top-left"
+                />
+              </div>
             </div>
           </div>
 

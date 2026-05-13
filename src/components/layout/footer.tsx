@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
-import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
+import { Instagram, Mail, Phone, MapPin } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 const footerLinks = {
@@ -12,7 +12,7 @@ const footerLinks = {
     links: [
       { name: 'NFC Cards', href: '/shop' },
       { name: 'Customization', href: '/customize/standard-black' },
-      { name: 'Bulk Orders', href: '/bulk' },
+      // { name: 'Bulk Orders', href: '/bulk' },
       { name: 'Pricing', href: '/shop' }
     ]
   },
@@ -21,25 +21,22 @@ const footerLinks = {
     links: [
       { name: 'About Us', href: '/about' },
       { name: 'Contact', href: '/contact' },
-      { name: 'Press', href: '/press' }
+      // { name: 'Press', href: '/press' }
     ]
   },
   support: {
     title: 'Support',
     links: [
-      { name: 'Help Center', href: '/help' },
+      { name: 'Contact', href: '/contact' },
       { name: 'FAQ', href: '/#faq' },
-      { name: 'Shipping', href: '/shipping' },
-      { name: 'Returns', href: '/returns' }
+      // { name: 'Shipping', href: '/shipping' },
+      // { name: 'Returns', href: '/returns' }
     ]
   }
 };
 
 const socialLinks = [
-  { name: 'Facebook', href: 'https://facebook.com', icon: Facebook },
-  { name: 'Twitter', href: 'https://twitter.com', icon: Twitter },
   { name: 'Instagram', href: 'https://instagram.com', icon: Instagram },
-  { name: 'LinkedIn', href: 'https://linkedin.com', icon: Linkedin }
 ];
 
 export function Footer() {
@@ -55,9 +52,9 @@ export function Footer() {
               <Image
                 src={theme === 'dark' ? '/tappy-out-dark-mode.svg' : '/tappy-out-light-mode.svg'}
                 alt="Logo"
-                width={128}
-                height={32}
-                className="h-10 w-32"
+                width={192}
+                height={48}
+                className="h-16 w-48"
               />
             </Link>
             <p className="text-muted-foreground mb-4 max-w-sm">
@@ -68,7 +65,7 @@ export function Footer() {
             <div className="space-y-2 text-sm text-muted-foreground">
               <div className="flex items-center space-x-2">
                 <Mail className="h-4 w-4" />
-                <span>adilkortbi@tappy-out.com</span>
+                <span>support@tappy-out.com</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Phone className="h-4 w-4" />
@@ -76,7 +73,7 @@ export function Footer() {
               </div>
               <div className="flex items-center space-x-2">
                 <MapPin className="h-4 w-4" />
-                <span>177 roselawn road, Dublin 15, Dublin</span>
+                <span>Unit 14 The Waxworks, The Village Centre, Dublin 15</span>
               </div>
             </div>
           </div>

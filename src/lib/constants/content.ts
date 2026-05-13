@@ -3,39 +3,30 @@ import { Testimonial, FAQ } from '../types';
 export const TESTIMONIALS: Testimonial[] = [
   {
     id: '1',
-    name: "Sam O'Neill",
+    name: "Sapphire Barbers",
     role: 'Owner',
     company: 'Sams Barbers',
-    content: 'These digital business cards have revolutionized our networking. Instant contact sharing and a lasting impression every time.',
+    content: 'Since switching to Tappy-Out NFC cards, it’s made a serious difference. Clients can book appointments or follow our Instagram instantly. No more explaining usernames or handing out paper cards that get lost. It just works.',
     rating: 5,
     avatar: '/images/avatars/sarah.jpg'
   },
   {
     id: '2',
-    name: 'Michael Chen',
-    role: 'Owner',
-    company: 'Dessert Delivery',
-    content: 'The premium wooden cards are absolutely stunning. They perfectly represent our brand and the NFC technology works flawlessly.',
+    name: 'CoElectrical',
+    role: 'Sales Manager',
+    company: 'CoElectrical',
+    content: 'We use Tappy-Out cards on every job now. It makes us look more professional and customers are impressed straight away. It’s a simple thing but it gives a strong first impression and helps bring in repeat work.',
     rating: 5,
     avatar: '/images/avatars/michael.jpg'
   },
   {
     id: '3',
-    name: 'Emily Rodriguez',
-    role: 'Sales Manager',
+    name: 'Independent Business Owner',
+    role: 'Owner',
     company: 'Global Innovations',
-    content: 'Our sales team loves these cards. The customization options and professional quality have significantly boosted our brand image.',
+    content: 'I didn’t realise how much time I was wasting with normal business cards until I switched. Now everything is done in seconds. People actually engage more, and I’ve noticed more traffic to my page.',
     rating: 5,
     avatar: '/images/avatars/emily.jpg'
-  },
-  {
-    id: '4',
-    name: 'David Park',
-    role: 'Creative Director',
-    company: 'Design Studio Pro',
-    content: 'The design customization tool is intuitive and powerful. We were able to create cards that perfectly match our creative vision.',
-    rating: 5,
-    avatar: '/images/avatars/david.jpg'
   }
 ];
 

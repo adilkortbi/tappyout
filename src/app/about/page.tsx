@@ -207,7 +207,7 @@ export default function AboutPage() {
                   <Mail className="h-5 w-5 text-primary" />
                   <div>
                     <div className="font-medium">Email Us</div>
-                    <div className="text-muted-foreground">adilkortbi@tappy-out.com</div>
+                    <div className="text-muted-foreground">support@tappy-out.com</div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
@@ -221,7 +221,7 @@ export default function AboutPage() {
                   <MapPin className="h-5 w-5 text-primary" />
                   <div>
                     <div className="font-medium">Visit Us</div>
-                    <div className="text-muted-foreground">177 roselawn road, Dublin 15, Dublin</div>
+                    <div className="text-muted-foreground">Unit 14 The Waxworks, The Village Centre, Dublin 15</div>
                   </div>
                 </div>
               </div>

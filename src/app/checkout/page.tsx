@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Elements } from '@stripe/react-stripe-js';
+import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -14,6 +15,7 @@ import { CheckoutForm } from '@/components/checkout/checkout-form';
 
 export default function CheckoutPage() {
   const { items, getTotal, getItemCount } = useCartStore();
+  const { theme } = useTheme();
   const [clientSecret, setClientSecret] = useState<string>('');
   const [orderComplete, setOrderComplete] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,6 +24,12 @@ export default function CheckoutPage() {
   const itemCount = getItemCount();
 
   useEffect(() => {
+    // Check if Stripe is configured
+    if (!stripePromise) {
+      setError('Stripe is not configured. Please add NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY to your environment variables.');
+      return;
+    }
+
     if (items.length > 0 && total > 0) {
       // Create PaymentIntent as soon as the page loads
       fetch('/api/stripe/payment-intent', {
@@ -93,21 +101,22 @@ export default function CheckoutPage() {
   }
 
   const appearance = {
-    theme: 'stripe' as const,
+    theme: (theme === 'dark' ? 'night' : 'stripe') as 'night' | 'stripe',
     variables: {
       colorPrimary: '#0570de',
-      colorBackground: '#ffffff',
-      colorText: '#30313d',
+      colorBackground: theme === 'dark' ? '#444444' : '#ffffff',
+      colorText: theme === 'dark' ? '#ffffff' : '#30313d',
       colorDanger: '#df1b41',
-      fontFamily: 'Ideal Sans, system-ui, sans-serif',
-      spacingUnit: '2px',
-      borderRadius: '4px',
+      fontFamily: 'system-ui, sans-serif',
+      spacingUnit: '4px',
+      borderRadius: '8px',
     },
   };
 
   const options = {
     clientSecret,
     appearance,
+    loader: 'auto' as const,
   };
 
   return (
@@ -145,11 +154,11 @@ export default function CheckoutPage() {
             </div>
           )}
 
-          {clientSecret && !error && (
-            <Elements options={options} stripe={stripePromise}>
-              <CheckoutForm 
-                total={total} 
-                onOrderComplete={() => setOrderComplete(true)} 
+          {clientSecret && !error && stripePromise && (
+            <Elements key={clientSecret} options={options} stripe={stripePromise}>
+              <CheckoutForm
+                total={total}
+                onOrderComplete={() => setOrderComplete(true)}
               />
             </Elements>
           )}

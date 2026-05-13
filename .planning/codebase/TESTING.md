@@ -218,7 +218,7 @@ export const mockProducts: Record<string, Product> = {
     id: 'premium-wood',
     name: 'Premium Wood Business Card',
     description: 'Eco-friendly wooden business card',
-    price: 24.99,
+    price: 17.99,
     image1: '/test-wood.png',
     image2: '/test-wood-alt.png',
     features: ['Sustainable Wood', 'Embedded NFC'],
