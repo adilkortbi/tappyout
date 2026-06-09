@@ -34,7 +34,6 @@ export default function CustomizePage({ params }: CustomizePageProps) {
       toast({
         title: "Enter a code",
         description: "Please enter a discount code.",
-        variant: "destructive",
       });
       return;
     }
@@ -50,7 +49,6 @@ export default function CustomizePage({ params }: CustomizePageProps) {
       toast({
         title: "Invalid Code",
         description: result.message,
-        variant: "destructive",
       });
     }
   };
