@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
 
         orderItemsHtml += `
           <div style="display: flex; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee;">
-            ${itemImage ? `<img src="${itemImage.startsWith('/') ? 'https://tappyout.com' + itemImage : itemImage}" alt="${itemName}" style="width: 80px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 15px;" />` : ''}
+            ${itemImage ? `<img src="${itemImage.startsWith('/') ? 'https://tappy-out.com' + itemImage : itemImage}" alt="${itemName}" style="width: 80px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 15px;" />` : ''}
             <div style="flex: 1;">
               <p style="margin: 0; font-weight: bold;">${itemName}</p>
               <p style="margin: 5px 0 0 0; font-size: 14px; color: #666;">Quantity: ${itemQuantity}</p>
@@ -101,9 +101,9 @@ export async function POST(req: NextRequest) {
 
       try {
         await resend.emails.send({
-          from: 'TappyOut <onboarding@resend.dev>',
+          from: 'Tappy Out <orders@tappy-out.com>',
           to: customerEmail,
-          subject: 'Your TappyOut Order Confirmation',
+          subject: 'Your Tappy Out Order Confirmation',
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <h1 style="color: #333;">Thank you for your purchase!</h1>
@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
                 <p style="margin: 5px 0;"><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
               </div>
               <p>If you have any questions, please contact our support team.</p>
-              <p>Best regards,<br/>The TappyOut Team</p>
+              <p>Best regards,<br/>The Tappy Out Team</p>
             </div>
           `,
         });
