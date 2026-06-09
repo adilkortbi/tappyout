@@ -9,19 +9,21 @@ import { useCartStore } from '@/lib/store/cart';
 import { ArrowLeft, Plus, Minus, X, ShoppingBag, CreditCard } from 'lucide-react';
 
 export default function CartPage() {
-  const { 
-    items, 
-    removeItem, 
-    updateQuantity, 
+  const {
+    items,
+    removeItem,
+    updateQuantity,
     getTotal,
+    getDiscountedTotal,
+    getDiscountAmount,
     getItemCount,
-    clearCart
+    clearCart,
+    appliedDiscountCode
   } = useCartStore();
 
   const subtotal = getTotal();
-  const shipping = 0; // Free shipping
-  const tax = 0; // No tax
-  const total = subtotal + shipping + tax;
+  const discountAmount = getDiscountAmount();
+  const total = getDiscountedTotal();
   const itemCount = getItemCount();
 
   if (items.length === 0) {
@@ -182,6 +184,12 @@ export default function CartPage() {
                   <span>Subtotal ({itemCount} items)</span>
                   <span>€{subtotal.toFixed(2)}</span>
                 </div>
+                {appliedDiscountCode && discountAmount > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Discount ({appliedDiscountCode})</span>
+                    <span>-€{discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span>Shipping</span>
                   <span className="text-green-600">Free</span>

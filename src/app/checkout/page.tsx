@@ -10,17 +10,19 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { useCartStore } from '@/lib/store/cart';
 import { stripePromise } from '@/lib/stripe/stripe';
-import { ArrowLeft, ShoppingBag, Truck, CheckCircle } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, Truck, CheckCircle, Pencil, Link as LinkIcon } from 'lucide-react';
 import { CheckoutForm } from '@/components/checkout/checkout-form';
 
 export default function CheckoutPage() {
-  const { items, getTotal, getItemCount } = useCartStore();
+  const { items, getTotal, getDiscountedTotal, getDiscountAmount, getItemCount, appliedDiscountCode } = useCartStore();
   const { theme } = useTheme();
   const [clientSecret, setClientSecret] = useState<string>('');
   const [orderComplete, setOrderComplete] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const total = getTotal();
+  const subtotal = getTotal();
+  const discountAmount = getDiscountAmount();
+  const total = getDiscountedTotal();
   const itemCount = getItemCount();
 
   useEffect(() => {
@@ -32,10 +34,24 @@ export default function CheckoutPage() {
 
     if (items.length > 0 && total > 0) {
       // Create PaymentIntent as soon as the page loads
+      // Include cart items data for order fulfillment
+      const orderItems = items.map(item => ({
+        name: item.product.name,
+        price: item.product.price,
+        quantity: item.quantity,
+        image: item.product.image1,
+        nfcUrl: item.customization?.nfcUrl || '',
+      }));
+
       fetch('/api/stripe/payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: total, currency: 'eur' }),
+        body: JSON.stringify({
+          amount: total,
+          currency: 'eur',
+          items: orderItems,
+          discountCode: appliedDiscountCode,
+        }),
       })
         .then((res) => res.json())
         .then((data) => {
@@ -51,7 +67,7 @@ export default function CheckoutPage() {
           setError('Failed to initialize payment. Please refresh and try again.');
         });
     }
-  }, [items, total]);
+  }, [items, total, appliedDiscountCode]);
 
   if (items.length === 0) {
     return (
@@ -183,28 +199,73 @@ export default function CheckoutPage() {
               {/* Items */}
               <div className="space-y-4">
                 {items.map((item) => (
-                  <div key={item.product.id} className="flex gap-4">
-                    <div className="h-16 w-20 rounded-lg overflow-hidden flex-shrink-0">
-                      <img
-                        src={item.product.image1}
-                        alt={item.product.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 space-y-1">
-                      <h4 className="font-medium text-sm">{item.product.name}</h4>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="text-xs">
-                          {item.product.category}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          Qty: {item.quantity}
-                        </span>
+                  <div key={item.product.id} className="space-y-3 pb-4 border-b last:border-b-0">
+                    <div className="flex gap-4">
+                      <div className="h-16 w-20 rounded-lg overflow-hidden flex-shrink-0">
+                        <img
+                          src={item.product.image1}
+                          alt={item.product.name}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                      <div className="text-sm font-semibold text-primary">
-                        €{(item.product.price * item.quantity).toFixed(2)}
+                      <div className="flex-1 space-y-1">
+                        <h4 className="font-medium text-sm">{item.product.name}</h4>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="secondary" className="text-xs">
+                            {item.product.category}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            Qty: {item.quantity}
+                          </span>
+                        </div>
+                        <div className="text-sm font-semibold text-primary">
+                          €{(item.product.price * item.quantity).toFixed(2)}
+                        </div>
                       </div>
                     </div>
+
+                    {/* NFC Link Display */}
+                    {item.customization?.nfcUrl && (
+                      <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <LinkIcon className="h-3 w-3" />
+                            <span>NFC Link</span>
+                          </div>
+                          <Link href={`/customize/${item.product.id}`}>
+                            <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
+                              <Pencil className="h-3 w-3 mr-1" />
+                              Edit
+                            </Button>
+                          </Link>
+                        </div>
+                        <a
+                          href={item.customization.nfcUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-primary hover:underline break-all"
+                        >
+                          {item.customization.nfcUrl}
+                        </a>
+                      </div>
+                    )}
+
+                    {/* No link warning */}
+                    {!item.customization?.nfcUrl && (
+                      <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-amber-700 dark:text-amber-300">
+                            No NFC link configured
+                          </span>
+                          <Link href={`/customize/${item.product.id}`}>
+                            <Button variant="outline" size="sm" className="h-6 px-2 text-xs">
+                              <Pencil className="h-3 w-3 mr-1" />
+                              Add Link
+                            </Button>
+                          </Link>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -215,8 +276,14 @@ export default function CheckoutPage() {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span>Subtotal ({itemCount} items)</span>
-                  <span>€{total.toFixed(2)}</span>
+                  <span>€{subtotal.toFixed(2)}</span>
                 </div>
+                {appliedDiscountCode && discountAmount > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Discount ({appliedDiscountCode})</span>
+                    <span>-€{discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span>Shipping</span>
                   <span className="text-green-600">Free</span>

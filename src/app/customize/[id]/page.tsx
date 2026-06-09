@@ -26,8 +26,34 @@ export default function CustomizePage({ params }: CustomizePageProps) {
   const [discountCode, setDiscountCode] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [savedDesign, setSavedDesign] = useState<{ canvas: object; nfcLink: string } | null>(null);
-  const { addItem, openCart } = useCartStore();
+  const { addItem, openCart, applyDiscount, appliedDiscountCode, removeDiscount } = useCartStore();
   const { toast } = useToast();
+
+  const handleApplyDiscount = () => {
+    if (!discountCode.trim()) {
+      toast({
+        title: "Enter a code",
+        description: "Please enter a discount code.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const result = applyDiscount(discountCode);
+    if (result.success) {
+      toast({
+        title: "Discount Applied",
+        description: result.message,
+      });
+      setDiscountCode('');
+    } else {
+      toast({
+        title: "Invalid Code",
+        description: result.message,
+        variant: "destructive",
+      });
+    }
+  };
 
   if (!product) {
     notFound();
@@ -271,17 +297,36 @@ export default function CustomizePage({ params }: CustomizePageProps) {
                     <Tag className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm font-medium">Discount Code</span>
                   </div>
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Enter discount code"
-                      value={discountCode}
-                      onChange={(e) => setDiscountCode(e.target.value)}
-                      className="flex-1"
-                    />
-                    <Button variant="outline" size="default">
-                      Apply
-                    </Button>
-                  </div>
+                  {appliedDiscountCode ? (
+                    <div className="flex items-center justify-between bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg p-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-green-700 dark:text-green-300">
+                          {appliedDiscountCode} applied (99% off)
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={removeDiscount}
+                        className="text-red-600 hover:text-red-700 h-auto p-1"
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Enter discount code"
+                        value={discountCode}
+                        onChange={(e) => setDiscountCode(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleApplyDiscount()}
+                        className="flex-1"
+                      />
+                      <Button variant="outline" size="default" onClick={handleApplyDiscount}>
+                        Apply
+                      </Button>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="pt-6">

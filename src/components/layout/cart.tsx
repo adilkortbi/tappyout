@@ -18,7 +18,10 @@ export function Cart() {
     removeItem,
     updateQuantity,
     getTotal,
-    getItemCount
+    getDiscountedTotal,
+    getDiscountAmount,
+    getItemCount,
+    appliedDiscountCode
   } = useCartStore();
 
   const [isVisible, setIsVisible] = useState(false);
@@ -45,7 +48,9 @@ export function Cart() {
 
   if (!isOpen && !isAnimating) return null;
 
-  const total = getTotal();
+  const subtotal = getTotal();
+  const discountAmount = getDiscountAmount();
+  const total = getDiscountedTotal();
   const itemCount = getItemCount();
 
   return (
@@ -181,8 +186,14 @@ export function Cart() {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Subtotal</span>
-                    <span>€{total.toFixed(2)}</span>
+                    <span>€{subtotal.toFixed(2)}</span>
                   </div>
+                  {appliedDiscountCode && discountAmount > 0 && (
+                    <div className="flex justify-between text-sm text-green-600">
+                      <span>Discount ({appliedDiscountCode})</span>
+                      <span>-€{discountAmount.toFixed(2)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-sm">
                     <span>Shipping</span>
                     <span className="text-green-600">Free</span>

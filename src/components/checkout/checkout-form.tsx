@@ -60,6 +60,7 @@ export function CheckoutForm({ total, onOrderComplete }: CheckoutFormProps) {
         quantity: item.quantity,
         image: item.product.image1,
         category: item.product.category,
+        nfcUrl: item.customization?.nfcUrl || '',
       })),
       total,
       customerEmail: customerInfo.email,

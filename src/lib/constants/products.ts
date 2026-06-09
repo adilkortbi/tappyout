@@ -20,7 +20,7 @@ export const PRODUCTS: Product[] = [
   {
     id: 'standard-white',
     name: 'Standard White PVC Card',
-    description: 'Luxurious metal business card with advanced NFC chip technology.',
+    description: 'Luxurious business card with advanced NFC chip technology.',
     price: 17.99,
     image1: 'https://images2.imgbox.com/5b/11/72I3a8GK_o.png',
     image2: 'https://images2.imgbox.com/5b/11/72I3a8GK_o.png',
