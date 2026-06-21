@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
     const blob = await put(uniqueFilename, buffer, {
       access: 'public',
       contentType: 'image/png',
+      token: process.env.BLOB_NEW_READ_WRITE_TOKEN,
     });
 
     return NextResponse.json({ url: blob.url });

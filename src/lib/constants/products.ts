@@ -2,12 +2,12 @@ import { Product } from '../types';
 
 export const PRODUCTS: Product[] = [
   {
-    id: 'standard-black',
-    name: 'Standard Black PVC Card',
-    description: 'Sleek black business card with NFC technology for seamless contact sharing.',
+    id: 'standard-white',
+    name: 'Standard White PVC Card',
+    description: 'Luxurious business card with advanced NFC chip technology.',
     price: 17.99,
-    image1: 'https://images2.imgbox.com/3d/7a/HgTpHCd1_o.png',
-    image2: 'https://images2.imgbox.com/3d/7a/HgTpHCd1_o.png',
+    image1: 'https://images2.imgbox.com/5b/11/72I3a8GK_o.png',
+    image2: 'https://images2.imgbox.com/5b/11/72I3a8GK_o.png',
     features: [
       'Durable PVC Material',
       'Custom Logo Printing',
@@ -17,12 +17,12 @@ export const PRODUCTS: Product[] = [
     category: 'standard'
   },
   {
-    id: 'standard-white',
-    name: 'Standard White PVC Card',
-    description: 'Luxurious business card with advanced NFC chip technology.',
+    id: 'standard-black',
+    name: 'Standard Black PVC Card',
+    description: 'Sleek black business card with NFC technology for seamless contact sharing.',
     price: 17.99,
-    image1: 'https://images2.imgbox.com/5b/11/72I3a8GK_o.png',
-    image2: 'https://images2.imgbox.com/5b/11/72I3a8GK_o.png',
+    image1: 'https://images2.imgbox.com/3d/7a/HgTpHCd1_o.png',
+    image2: 'https://images2.imgbox.com/3d/7a/HgTpHCd1_o.png',
     features: [
       'Durable PVC Material',
       'Custom Logo Printing',
