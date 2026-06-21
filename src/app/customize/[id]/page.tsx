@@ -25,7 +25,7 @@ export default function CustomizePage({ params }: CustomizePageProps) {
   const product = PRODUCTS.find(p => p.id === id);
   const [discountCode, setDiscountCode] = useState('');
   const [quantity, setQuantity] = useState(1);
-  const [savedDesign, setSavedDesign] = useState<{ canvas: object; nfcLink: string; canvasImage?: string } | null>(null);
+  const [savedDesign, setSavedDesign] = useState<{ canvas: object; nfcLink: string; canvasImage?: string; logoImage?: string | null } | null>(null);
   const { addItem, openCart, applyDiscount, appliedDiscountCode, removeDiscount, getDiscountPercent } = useCartStore();
   const discountPercent = getDiscountPercent();
   const { toast } = useToast();
@@ -73,6 +73,7 @@ export default function CustomizePage({ params }: CustomizePageProps) {
         nfcUrl: savedDesign.nfcLink,
         canvasDesign: savedDesign.canvas,
         canvasImage: savedDesign.canvasImage,
+        logoImage: savedDesign.logoImage || undefined,
       });
     }
 

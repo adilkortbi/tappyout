@@ -20,6 +20,7 @@ export interface CartItem {
     nfcUrl?: string;
     canvasDesign?: object;
     canvasImage?: string; // Base64 data URL of the customized card design
+    logoImage?: string; // Base64 data URL of the original logo
   };
 }
 

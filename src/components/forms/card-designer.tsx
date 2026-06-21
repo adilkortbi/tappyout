@@ -22,6 +22,7 @@ export function CardDesigner({ cardTemplate = 'standard', onDesignChange, onSave
   const [selectedObject, setSelectedObject] = useState<fabric.Object | null>(null);
   const [nfcLink, setNfcLink] = useState<string>('');
   const [urlError, setUrlError] = useState<string>('');
+  const [logoImage, setLogoImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -148,7 +149,10 @@ export function CardDesigner({ cardTemplate = 'standard', onDesignChange, onSave
     const reader = new FileReader();
     reader.onload = (e) => {
       const result = e.target?.result as string;
-      
+
+      // Save the original logo image
+      setLogoImage(result);
+
       fabric.Image.fromURL(result).then((img) => {
         // Scale image to fill the card area (max size initially)
         // Card boundaries: left=68, top=47, width=264, height=156
@@ -235,6 +239,7 @@ export function CardDesigner({ cardTemplate = 'standard', onDesignChange, onSave
       canvas: isWoodenCard ? {} : canvas!.toJSON(),
       nfcLink: nfcLink.trim(),
       canvasImage, // Base64 image for uploading later
+      logoImage, // Original logo for uploading later
     };
 
     if (onDesignChange) {

@@ -143,22 +143,41 @@ export async function POST(req: NextRequest) {
           const itemPrice = parseFloat(metadata[`item_${i}_price`] || '0').toFixed(2);
           const itemQuantity = metadata[`item_${i}_quantity`] || '1';
           const itemImage = metadata[`item_${i}_image`] || '';
+          const itemLogo = metadata[`item_${i}_logo`] || '';
           const itemNfcUrl = metadata[`item_${i}_nfcUrl`] || '';
 
           adminOrderItemsHtml += `
             <div style="background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
-              <div style="display: flex; align-items: flex-start; gap: 15px;">
-                ${itemImage ? `<img src="${itemImage.startsWith('/') ? 'https://www.tappy-out.com' + itemImage : itemImage}" alt="${itemName}" style="width: 120px; height: 75px; object-fit: cover; border-radius: 4px;" />` : ''}
-                <div style="flex: 1;">
-                  <h3 style="margin: 0 0 8px 0; color: #333;">${itemName}</h3>
-                  <p style="margin: 0 0 5px 0; font-size: 14px;"><strong>Quantity:</strong> ${itemQuantity}</p>
-                  <p style="margin: 0 0 5px 0; font-size: 14px;"><strong>Price:</strong> €${itemPrice}</p>
-                  ${itemNfcUrl ? `
-                    <p style="margin: 10px 0 5px 0; font-size: 14px;"><strong>NFC URL to program:</strong></p>
-                    <a href="${itemNfcUrl}" style="color: #0066cc; word-break: break-all; font-size: 14px;">${itemNfcUrl}</a>
-                  ` : '<p style="margin: 10px 0 0 0; font-size: 14px; color: #e74c3c;"><strong>⚠️ No NFC URL provided</strong></p>'}
+              <h3 style="margin: 0 0 12px 0; color: #333;">${itemName}</h3>
+              <p style="margin: 0 0 5px 0; font-size: 14px;"><strong>Quantity:</strong> ${itemQuantity}</p>
+              <p style="margin: 0 0 10px 0; font-size: 14px;"><strong>Price:</strong> €${itemPrice}</p>
+
+              ${itemNfcUrl ? `
+                <div style="background: #e8f4fd; border: 1px solid #0066cc; border-radius: 6px; padding: 10px; margin-bottom: 15px;">
+                  <p style="margin: 0 0 5px 0; font-size: 14px; font-weight: bold; color: #0066cc;">NFC URL to program:</p>
+                  <a href="${itemNfcUrl}" style="color: #0066cc; word-break: break-all; font-size: 14px;">${itemNfcUrl}</a>
                 </div>
-              </div>
+              ` : '<div style="background: #ffeaea; border: 1px solid #e74c3c; border-radius: 6px; padding: 10px; margin-bottom: 15px;"><p style="margin: 0; font-size: 14px; color: #e74c3c;"><strong>⚠️ No NFC URL provided</strong></p></div>'}
+
+              ${itemImage ? `
+                <div style="margin-bottom: 15px;">
+                  <p style="margin: 0 0 8px 0; font-size: 14px; font-weight: bold;">Final Card Design:</p>
+                  <a href="${itemImage}" style="display: block;">
+                    <img src="${itemImage.startsWith('/') ? 'https://www.tappy-out.com' + itemImage : itemImage}" alt="Final Design" style="max-width: 100%; width: 400px; height: auto; border-radius: 8px; border: 1px solid #ddd;" />
+                  </a>
+                  <p style="margin: 5px 0 0 0; font-size: 12px;"><a href="${itemImage}" style="color: #0066cc;">Download Full Size</a></p>
+                </div>
+              ` : ''}
+
+              ${itemLogo ? `
+                <div style="margin-bottom: 10px;">
+                  <p style="margin: 0 0 8px 0; font-size: 14px; font-weight: bold;">Original Logo:</p>
+                  <a href="${itemLogo}" style="display: block;">
+                    <img src="${itemLogo}" alt="Original Logo" style="max-width: 200px; height: auto; border-radius: 4px; border: 1px solid #ddd; background: #f5f5f5; padding: 10px;" />
+                  </a>
+                  <p style="margin: 5px 0 0 0; font-size: 12px;"><a href="${itemLogo}" style="color: #0066cc;">Download Full Size</a></p>
+                </div>
+              ` : ''}
             </div>
           `;
         }

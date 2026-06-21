@@ -33,44 +33,16 @@ export default function CheckoutPage() {
     }
 
     if (items.length > 0 && total > 0) {
-      // Upload canvas images and create PaymentIntent
       const initializeCheckout = async () => {
         try {
-          // Upload canvas images to Vercel Blob
-          const orderItems = await Promise.all(
-            items.map(async (item) => {
-              let imageUrl = item.product.image1;
-
-              // If there's a custom canvas image, upload it
-              if (item.customization?.canvasImage) {
-                try {
-                  const uploadRes = await fetch('/api/upload', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      image: item.customization.canvasImage,
-                      filename: `${item.product.id}-${Date.now()}.png`,
-                    }),
-                  });
-                  const uploadData = await uploadRes.json();
-                  if (uploadData.url) {
-                    imageUrl = uploadData.url;
-                  }
-                } catch (uploadError) {
-                  console.error('Failed to upload design image:', uploadError);
-                  // Fall back to product image if upload fails
-                }
-              }
-
-              return {
-                name: item.product.name,
-                price: item.product.price,
-                quantity: item.quantity,
-                image: imageUrl,
-                nfcUrl: item.customization?.nfcUrl || '',
-              };
-            })
-          );
+          // Step 1: Create payment intent first to get the ID
+          const orderItems = items.map((item) => ({
+            name: item.product.name,
+            price: item.product.price,
+            quantity: item.quantity,
+            image: item.product.image1, // Placeholder, will update after upload
+            nfcUrl: item.customization?.nfcUrl || '',
+          }));
 
           const res = await fetch('/api/stripe/payment-intent', {
             method: 'POST',
@@ -86,10 +58,78 @@ export default function CheckoutPage() {
           const data = await res.json();
           if (data.error) {
             setError(data.error);
-          } else if (data.clientSecret) {
-            setClientSecret(data.clientSecret);
-            setError(null);
+            return;
           }
+
+          const { clientSecret: secret, paymentIntentId } = data;
+
+          // Step 2: Upload images using payment intent ID as folder
+          const updatedMetadata: Record<string, string> = {};
+
+          for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+
+            // Upload final design if exists
+            if (item.customization?.canvasImage) {
+              try {
+                const designRes = await fetch('/api/upload', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    image: item.customization.canvasImage,
+                    paymentIntentId,
+                    type: `item-${i}-final-design`,
+                  }),
+                });
+                const designData = await designRes.json();
+                if (designData.url) {
+                  updatedMetadata[`item_${i}_image`] = designData.url;
+                }
+              } catch (uploadError) {
+                console.error('Failed to upload design image:', uploadError);
+              }
+            }
+
+            // Upload original logo if exists
+            if (item.customization?.logoImage) {
+              try {
+                const logoRes = await fetch('/api/upload', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    image: item.customization.logoImage,
+                    paymentIntentId,
+                    type: `item-${i}-logo`,
+                  }),
+                });
+                const logoData = await logoRes.json();
+                if (logoData.url) {
+                  updatedMetadata[`item_${i}_logo`] = logoData.url;
+                }
+              } catch (uploadError) {
+                console.error('Failed to upload logo image:', uploadError);
+              }
+            }
+          }
+
+          // Step 3: Update payment intent with image URLs
+          if (Object.keys(updatedMetadata).length > 0) {
+            try {
+              await fetch('/api/stripe/update-metadata', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  paymentIntentId,
+                  metadata: updatedMetadata,
+                }),
+              });
+            } catch (metadataError) {
+              console.error('Failed to update metadata:', metadataError);
+            }
+          }
+
+          setClientSecret(secret);
+          setError(null);
         } catch (error) {
           console.error('Error creating payment intent:', error);
           setError('Failed to initialize payment. Please refresh and try again.');

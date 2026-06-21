@@ -3,21 +3,25 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
-    const { image, filename } = await req.json();
+    const { image, paymentIntentId, type = 'final-design' } = await req.json();
 
     if (!image) {
       return NextResponse.json({ error: 'No image provided' }, { status: 400 });
+    }
+
+    if (!paymentIntentId) {
+      return NextResponse.json({ error: 'No payment intent ID provided' }, { status: 400 });
     }
 
     // Remove the data URL prefix to get raw base64
     const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
     const buffer = Buffer.from(base64Data, 'base64');
 
-    // Generate unique filename
-    const uniqueFilename = `card-designs/${Date.now()}-${filename || 'design.png'}`;
+    // Use payment intent ID as folder name, type as filename
+    const filename = `card-designs/${paymentIntentId}/${type}.png`;
 
     // Upload to Vercel Blob
-    const blob = await put(uniqueFilename, buffer, {
+    const blob = await put(filename, buffer, {
       access: 'public',
       contentType: 'image/png',
       token: process.env.BLOB_NEW_READ_WRITE_TOKEN,
