@@ -13,13 +13,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No payment intent ID provided' }, { status: 400 });
     }
 
-    // Extract content type and extension from data URL
-    const mimeMatch = image.match(/^data:(image\/\w+);base64,/);
+    // Extract content type from data URL
+    const mimeMatch = image.match(/^data:(image\/[^;]+);base64,/);
     const mimeType = mimeMatch ? mimeMatch[1] : 'image/png';
-    const extension = mimeType.split('/')[1] || 'png';
+
+    // Map mime type to extension
+    const extMap: Record<string, string> = {
+      'image/png': 'png',
+      'image/jpeg': 'jpg',
+      'image/jpg': 'jpg',
+      'image/gif': 'gif',
+      'image/webp': 'webp',
+      'image/svg+xml': 'svg',
+    };
+    const extension = extMap[mimeType] || 'png';
 
     // Remove the data URL prefix to get raw base64
-    const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
+    const base64Data = image.replace(/^data:image\/[^;]+;base64,/, '');
     const buffer = Buffer.from(base64Data, 'base64');
 
     // Use payment intent ID as folder name, type as filename with correct extension
