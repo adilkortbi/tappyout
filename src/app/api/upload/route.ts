@@ -13,17 +13,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No payment intent ID provided' }, { status: 400 });
     }
 
+    // Extract content type and extension from data URL
+    const mimeMatch = image.match(/^data:(image\/\w+);base64,/);
+    const mimeType = mimeMatch ? mimeMatch[1] : 'image/png';
+    const extension = mimeType.split('/')[1] || 'png';
+
     // Remove the data URL prefix to get raw base64
     const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
     const buffer = Buffer.from(base64Data, 'base64');
 
-    // Use payment intent ID as folder name, type as filename
-    const filename = `card-designs/${paymentIntentId}/${type}.png`;
+    // Use payment intent ID as folder name, type as filename with correct extension
+    const filename = `card-designs/${paymentIntentId}/${type}.${extension}`;
 
     // Upload to Vercel Blob
     const blob = await put(filename, buffer, {
       access: 'public',
-      contentType: 'image/png',
+      contentType: mimeType,
       token: process.env.BLOB_NEW_READ_WRITE_TOKEN,
     });
 
