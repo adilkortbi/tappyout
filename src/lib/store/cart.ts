@@ -15,6 +15,7 @@ interface CartStore {
   getTotal: () => number;
   getDiscountedTotal: () => number;
   getDiscountAmount: () => number;
+  getDiscountPercent: () => number;
   getItemCount: () => number;
   toggleCart: () => void;
   openCart: () => void;
@@ -24,7 +25,8 @@ interface CartStore {
 }
 
 const VALID_DISCOUNT_CODES: Record<string, number> = {
-  'ADIL99OFF': 99, // 99% off
+  'ADIL99OFF': 99, // 99% 
+  '75OFF': 75 //  75% off
 };
 
 export const useCartStore = create<CartStore>()(
@@ -90,6 +92,12 @@ export const useCartStore = create<CartStore>()(
         const discountPercent = VALID_DISCOUNT_CODES[code.toUpperCase()];
         if (!discountPercent) return 0;
         return get().getTotal() * (discountPercent / 100);
+      },
+
+      getDiscountPercent: () => {
+        const code = get().appliedDiscountCode;
+        if (!code) return 0;
+        return VALID_DISCOUNT_CODES[code.toUpperCase()] || 0;
       },
 
       getDiscountedTotal: () => {

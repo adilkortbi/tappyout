@@ -9,7 +9,6 @@ export const PRODUCTS: Product[] = [
     image1: 'https://images2.imgbox.com/3d/7a/HgTpHCd1_o.png',
     image2: 'https://images2.imgbox.com/3d/7a/HgTpHCd1_o.png',
     features: [
-      'NFC Technology',
       'Durable PVC Material',
       'Custom Logo Printing',
       'Contact Sharing',
@@ -25,7 +24,6 @@ export const PRODUCTS: Product[] = [
     image1: 'https://images2.imgbox.com/5b/11/72I3a8GK_o.png',
     image2: 'https://images2.imgbox.com/5b/11/72I3a8GK_o.png',
     features: [
-      'NFC Technology',
       'Durable PVC Material',
       'Custom Logo Printing',
       'Contact Sharing',
@@ -42,7 +40,6 @@ export const PRODUCTS: Product[] = [
     image2: 'https://images2.imgbox.com/35/9e/dBSl2Bwn_o.png',
     features: [
       'Sustainable Wood Material',
-      'Embedded NFC Chip',
       'Laser Engraving',
       'Unique Grain Pattern',
       'Eco-Friendly Packaging'

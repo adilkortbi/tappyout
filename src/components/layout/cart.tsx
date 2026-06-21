@@ -212,11 +212,6 @@ export function Cart() {
                       Checkout
                     </Link>
                   </Button>
-                  <Button variant="outline" className="w-full" asChild>
-                    <Link href="/cart" onClick={closeCart}>
-                      View Cart
-                    </Link>
-                  </Button>
                 </div>
 
                 {/* Trust Indicators */}

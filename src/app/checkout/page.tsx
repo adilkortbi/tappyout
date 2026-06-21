@@ -33,39 +33,70 @@ export default function CheckoutPage() {
     }
 
     if (items.length > 0 && total > 0) {
-      // Create PaymentIntent as soon as the page loads
-      // Include cart items data for order fulfillment
-      const orderItems = items.map(item => ({
-        name: item.product.name,
-        price: item.product.price,
-        quantity: item.quantity,
-        image: item.product.image1,
-        nfcUrl: item.customization?.nfcUrl || '',
-      }));
+      // Upload canvas images and create PaymentIntent
+      const initializeCheckout = async () => {
+        try {
+          // Upload canvas images to Vercel Blob
+          const orderItems = await Promise.all(
+            items.map(async (item) => {
+              let imageUrl = item.product.image1;
 
-      fetch('/api/stripe/payment-intent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: total,
-          currency: 'eur',
-          items: orderItems,
-          discountCode: appliedDiscountCode,
-        }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
+              // If there's a custom canvas image, upload it
+              if (item.customization?.canvasImage) {
+                try {
+                  const uploadRes = await fetch('/api/upload', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      image: item.customization.canvasImage,
+                      filename: `${item.product.id}-${Date.now()}.png`,
+                    }),
+                  });
+                  const uploadData = await uploadRes.json();
+                  if (uploadData.url) {
+                    imageUrl = uploadData.url;
+                  }
+                } catch (uploadError) {
+                  console.error('Failed to upload design image:', uploadError);
+                  // Fall back to product image if upload fails
+                }
+              }
+
+              return {
+                name: item.product.name,
+                price: item.product.price,
+                quantity: item.quantity,
+                image: imageUrl,
+                nfcUrl: item.customization?.nfcUrl || '',
+              };
+            })
+          );
+
+          const res = await fetch('/api/stripe/payment-intent', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              amount: total,
+              currency: 'eur',
+              items: orderItems,
+              discountCode: appliedDiscountCode,
+            }),
+          });
+
+          const data = await res.json();
           if (data.error) {
             setError(data.error);
           } else if (data.clientSecret) {
             setClientSecret(data.clientSecret);
             setError(null);
           }
-        })
-        .catch((error) => {
+        } catch (error) {
           console.error('Error creating payment intent:', error);
           setError('Failed to initialize payment. Please refresh and try again.');
-        });
+        }
+      };
+
+      initializeCheckout();
     }
   }, [items, total, appliedDiscountCode]);
 

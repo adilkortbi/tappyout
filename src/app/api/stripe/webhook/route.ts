@@ -133,6 +133,69 @@ export async function POST(req: NextRequest) {
       } catch (emailError) {
         console.error('Failed to send receipt email:', emailError);
       }
+
+      // Send notification email to business owner
+      try {
+        // Build admin order items HTML with more detail
+        let adminOrderItemsHtml = '';
+        for (let i = 0; i < itemCount; i++) {
+          const itemName = metadata[`item_${i}_name`] || 'Product';
+          const itemPrice = parseFloat(metadata[`item_${i}_price`] || '0').toFixed(2);
+          const itemQuantity = metadata[`item_${i}_quantity`] || '1';
+          const itemImage = metadata[`item_${i}_image`] || '';
+          const itemNfcUrl = metadata[`item_${i}_nfcUrl`] || '';
+
+          adminOrderItemsHtml += `
+            <div style="background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+              <div style="display: flex; align-items: flex-start; gap: 15px;">
+                ${itemImage ? `<img src="${itemImage.startsWith('/') ? 'https://www.tappy-out.com' + itemImage : itemImage}" alt="${itemName}" style="width: 120px; height: 75px; object-fit: cover; border-radius: 4px;" />` : ''}
+                <div style="flex: 1;">
+                  <h3 style="margin: 0 0 8px 0; color: #333;">${itemName}</h3>
+                  <p style="margin: 0 0 5px 0; font-size: 14px;"><strong>Quantity:</strong> ${itemQuantity}</p>
+                  <p style="margin: 0 0 5px 0; font-size: 14px;"><strong>Price:</strong> €${itemPrice}</p>
+                  ${itemNfcUrl ? `
+                    <p style="margin: 10px 0 5px 0; font-size: 14px;"><strong>NFC URL to program:</strong></p>
+                    <a href="${itemNfcUrl}" style="color: #0066cc; word-break: break-all; font-size: 14px;">${itemNfcUrl}</a>
+                  ` : '<p style="margin: 10px 0 0 0; font-size: 14px; color: #e74c3c;"><strong>⚠️ No NFC URL provided</strong></p>'}
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        await resend.emails.send({
+          from: 'Tappy Out Orders <orders@tappy-out.com>',
+          to: 'anasalagtal@gmail.com',
+          subject: `🛒 New Order from ${customerName} - €${formattedAmount}`,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f9f9f9; padding: 20px;">
+              <div style="background: #2ecc71; color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center;">
+                <h1 style="margin: 0;">🎉 New Order Received!</h1>
+              </div>
+
+              <div style="background: white; padding: 20px; border-radius: 0 0 8px 8px;">
+                <h2 style="color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px;">Customer Details</h2>
+                <p style="margin: 8px 0;"><strong>Name:</strong> ${customerName}</p>
+                <p style="margin: 8px 0;"><strong>Email:</strong> <a href="mailto:${customerEmail}">${customerEmail}</a></p>
+                <p style="margin: 8px 0;"><strong>Amount Paid:</strong> €${formattedAmount} ${currency}</p>
+                <p style="margin: 8px 0;"><strong>Transaction ID:</strong> ${transactionId}</p>
+                <p style="margin: 8px 0;"><strong>Date:</strong> ${new Date().toLocaleString()}</p>
+
+                <h2 style="color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 25px;">Order Items (${itemCount})</h2>
+                ${adminOrderItemsHtml}
+
+                <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 15px; margin-top: 20px;">
+                  <p style="margin: 0; color: #856404;"><strong>📋 Action Required:</strong> Program the NFC card(s) with the URL(s) above and ship to customer.</p>
+                </div>
+              </div>
+            </div>
+          `,
+        });
+
+        console.log(`Admin notification sent for order ${transactionId}`);
+      } catch (adminEmailError) {
+        console.error('Failed to send admin notification:', adminEmailError);
+      }
     }
   }
 

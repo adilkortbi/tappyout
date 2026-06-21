@@ -96,10 +96,10 @@ export function CardDesigner({ cardTemplate = 'standard', onDesignChange, onSave
 
     // Limit scaling so logo stays within the visible card area
     // Card has padding in the template image, actual card boundaries:
-    const cardLeft = 80;
-    const cardTop = 50;
-    const cardWidth = 240;
-    const cardHeight = 140;
+    const cardLeft = 68;
+    const cardTop = 47;
+    const cardWidth = 264;
+    const cardHeight = 156;
     const cardRight = cardLeft + cardWidth;
     const cardBottom = cardTop + cardHeight;
 
@@ -151,14 +151,14 @@ export function CardDesigner({ cardTemplate = 'standard', onDesignChange, onSave
       
       fabric.Image.fromURL(result).then((img) => {
         // Scale image to fill the card area (max size initially)
-        // Card boundaries: left=80, top=50, width=240, height=140
-        const cardWidth = 240;
-        const cardHeight = 140;
+        // Card boundaries: left=68, top=47, width=264, height=156
+        const cardWidth = 264;
+        const cardHeight = 156;
         const scale = Math.min(cardWidth / img.width!, cardHeight / img.height!);
 
         // Center the logo within the card area
-        const centerX = 80 + (cardWidth - (img.width! * scale)) / 2;
-        const centerY = 50 + (cardHeight - (img.height! * scale)) / 2;
+        const centerX = 68 + (cardWidth - (img.width! * scale)) / 2;
+        const centerY = 47 + (cardHeight - (img.height! * scale)) / 2;
         
         img.set({
           left: centerX,
@@ -224,9 +224,17 @@ export function CardDesigner({ cardTemplate = 'standard', onDesignChange, onSave
     // Clear any previous error
     setUrlError('');
 
+    // Export canvas as image for email
+    const canvasImage = isWoodenCard ? null : canvas!.toDataURL({
+      format: 'png',
+      quality: 1,
+      multiplier: 2,
+    });
+
     const designData = {
       canvas: isWoodenCard ? {} : canvas!.toJSON(),
       nfcLink: nfcLink.trim(),
+      canvasImage, // Base64 image for uploading later
     };
 
     if (onDesignChange) {
@@ -324,6 +332,15 @@ export function CardDesigner({ cardTemplate = 'standard', onDesignChange, onSave
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
+          {/* Info for black cards */}
+          {cardTemplate !== 'standard-white' && (
+            <div className="bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+              <p className="text-sm text-slate-700 dark:text-slate-300">
+                <span className="font-medium">Please Note.</span> Our black cards are printed using a specialised process that works best with white designs. For optimal results, please upload a logo in white or we recommend purchasing a white card.
+              </p>
+            </div>
+          )}
+
           {/* Canvas - scaled down on mobile to fit screen */}
           <div className="flex justify-center -mx-2 sm:mx-0">
             <div className="border rounded-lg p-2 sm:p-4 bg-muted/30">
@@ -360,11 +377,6 @@ export function CardDesigner({ cardTemplate = 'standard', onDesignChange, onSave
                 <p className="text-xs text-muted-foreground">
                   Supports PNG, JPG, and SVG files up to 5MB
                 </p>
-                {cardTemplate !== 'standard-white' && (
-                  <p className="text-xs text-amber-600 dark:text-amber-400">
-                    💡 Tip: Use a white or light-colored logo for best visibility on the black card.
-                  </p>
-                )}
               </div>
             </div>
 

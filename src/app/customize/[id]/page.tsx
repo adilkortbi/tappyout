@@ -25,8 +25,9 @@ export default function CustomizePage({ params }: CustomizePageProps) {
   const product = PRODUCTS.find(p => p.id === id);
   const [discountCode, setDiscountCode] = useState('');
   const [quantity, setQuantity] = useState(1);
-  const [savedDesign, setSavedDesign] = useState<{ canvas: object; nfcLink: string } | null>(null);
-  const { addItem, openCart, applyDiscount, appliedDiscountCode, removeDiscount } = useCartStore();
+  const [savedDesign, setSavedDesign] = useState<{ canvas: object; nfcLink: string; canvasImage?: string } | null>(null);
+  const { addItem, openCart, applyDiscount, appliedDiscountCode, removeDiscount, getDiscountPercent } = useCartStore();
+  const discountPercent = getDiscountPercent();
   const { toast } = useToast();
 
   const handleApplyDiscount = () => {
@@ -71,6 +72,7 @@ export default function CustomizePage({ params }: CustomizePageProps) {
       addItem(product, {
         nfcUrl: savedDesign.nfcLink,
         canvasDesign: savedDesign.canvas,
+        canvasImage: savedDesign.canvasImage,
       });
     }
 
@@ -168,9 +170,20 @@ export default function CustomizePage({ params }: CustomizePageProps) {
                   <Badge variant="secondary">{product.category}</Badge>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-primary">
-                    €{product.price.toFixed(2)}
-                  </div>
+                  {appliedDiscountCode ? (
+                    <>
+                      <div className="text-lg text-muted-foreground line-through">
+                        €{product.price.toFixed(2)}
+                      </div>
+                      <div className="text-2xl font-bold text-green-600">
+                        €{(product.price * (1 - discountPercent / 100)).toFixed(2)}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-2xl font-bold text-primary">
+                      €{product.price.toFixed(2)}
+                    </div>
+                  )}
                 </div>
               </div>
               
@@ -211,10 +224,6 @@ export default function CustomizePage({ params }: CustomizePageProps) {
                     <span className="text-sm font-medium">Included</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm">Laser-Engraved NFC Icon</span>
-                    <span className="text-sm font-medium">Included</span>
-                  </div>
-                  <div className="flex justify-between">
                     <span className="text-sm">Eco-Friendly Packaging</span>
                     <span className="text-sm font-medium">Included</span>
                   </div>
@@ -225,17 +234,17 @@ export default function CustomizePage({ params }: CustomizePageProps) {
                     <span className="text-sm">Logo Upload & Sizing</span>
                     <span className="text-sm font-medium">Included</span>
                   </div>
-                  <div className="flex justify-between">
+                  {/* <div className="flex justify-between">
                     <span className="text-sm">Custom Color Scheme</span>
                     <span className="text-sm text-muted-foreground">Available</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm">Text Customization</span>
                     <span className="text-sm text-muted-foreground">Available</span>
-                  </div>
+                  </div> */}
                   <div className="flex justify-between">
                     <span className="text-sm">Premium Packaging</span>
-                    <span className="text-sm font-medium">+€5.00</span>
+                    <span className="text-sm text-muted-foreground">Upon Request</span>
                   </div>
                 </div>
               )}
@@ -272,8 +281,16 @@ export default function CustomizePage({ params }: CustomizePageProps) {
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
                   <span>Subtotal ({quantity} item{quantity > 1 ? 's' : ''})</span>
-                  <span>€{(product.price * quantity).toFixed(2)}</span>
+                  <span className={appliedDiscountCode ? 'line-through text-muted-foreground' : ''}>
+                    €{(product.price * quantity).toFixed(2)}
+                  </span>
                 </div>
+                {appliedDiscountCode && (
+                  <div className="flex justify-between text-sm text-green-600">
+                    <span>Discount ({discountPercent}% off)</span>
+                    <span>-€{(product.price * quantity * (discountPercent / 100)).toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm">
                   <span>Customization</span>
                   <span>Free</span>
@@ -285,7 +302,11 @@ export default function CustomizePage({ params }: CustomizePageProps) {
                 <Separator />
                 <div className="flex justify-between font-semibold">
                   <span>Total</span>
-                  <span>€{(product.price * quantity).toFixed(2)}</span>
+                  {appliedDiscountCode ? (
+                    <span className="text-green-600">€{(product.price * quantity * (1 - discountPercent / 100)).toFixed(2)}</span>
+                  ) : (
+                    <span>€{(product.price * quantity).toFixed(2)}</span>
+                  )}
                 </div>
               </div>
 
@@ -299,7 +320,7 @@ export default function CustomizePage({ params }: CustomizePageProps) {
                     <div className="flex items-center justify-between bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg p-3">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium text-green-700 dark:text-green-300">
-                          {appliedDiscountCode} applied (99% off)
+                          {appliedDiscountCode} applied ({discountPercent}% off)
                         </span>
                       </div>
                       <Button
